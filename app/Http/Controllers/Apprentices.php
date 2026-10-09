@@ -9,7 +9,8 @@ class Apprentices extends Controller
 {
     private function fetchDataFromApi($url)
     {
-        return Http::get($url)->throw()->object();
+        $response = Http::get($url);
+        return $response->json();
     }
 
     public function index()
@@ -30,27 +31,13 @@ class Apprentices extends Controller
 
     public function create()
     {
-        $url = env('URL_SERVER_API');
-        $courses = $this->fetchDataFromApi($url . '/courses');
-        $computers = $this->fetchDataFromApi($url . '/computers');
-        $apprentice = null;
-        $isEditing = false;
-
-        return view('apprentices.form', compact('apprentice', 'courses', 'computers', 'isEditing'));
+        return view('apprentices.create');
     }
 
     public function store(Request $request)
     {
         $url = env('URL_SERVER_API');
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'cell_number' => ['required', 'string', 'max:30'],
-            'course_id' => ['required', 'integer', 'min:1'],
-            'computer_id' => ['required', 'integer', 'min:1'],
-        ]);
-
-        Http::post($url . '/apprentices', $data)->throw();
+        Http::post($url . '/apprentices', $request->all());
 
         return redirect()->route('apprentices.index');
     }
@@ -59,25 +46,13 @@ class Apprentices extends Controller
     {
         $url = env('URL_SERVER_API');
         $apprentice = $this->fetchDataFromApi($url . '/apprentices/' . $id);
-        $courses = $this->fetchDataFromApi($url . '/courses');
-        $computers = $this->fetchDataFromApi($url . '/computers');
-        $isEditing = true;
-
-        return view('apprentices.form', compact('apprentice', 'courses', 'computers', 'isEditing'));
+        return view('apprentices.edit', compact('apprentice'));
     }
 
     public function update(Request $request, $id)
     {
         $url = env('URL_SERVER_API');
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'cell_number' => ['required', 'string', 'max:30'],
-            'course_id' => ['required', 'integer', 'min:1'],
-            'computer_id' => ['required', 'integer', 'min:1'],
-        ]);
-
-        Http::put($url . '/apprentices/' . $id, $data)->throw();
+        Http::put($url . '/apprentices/' . $id, $request->all());
 
         return redirect()->route('apprentices.index');
     }
@@ -85,7 +60,7 @@ class Apprentices extends Controller
     public function destroy($id)
     {
         $url = env('URL_SERVER_API');
-        Http::delete($url . '/apprentices/' . $id)->throw();
+        Http::delete($url . '/apprentices/' . $id);
 
         return redirect()->route('apprentices.index');
     }

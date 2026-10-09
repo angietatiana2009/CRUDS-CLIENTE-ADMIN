@@ -10,7 +10,8 @@ class Areas extends Controller
     // Método privado para manejar llamadas HTTP repetitivas
     private function fetchDataFromApi($url)
     {
-        return Http::get($url)->throw()->object();
+        $response = Http::get($url);
+        return $response->json();
     }
 
     public function index()   //http://api.codersfree.test/v1/categories?included=posts
@@ -40,15 +41,7 @@ class Areas extends Controller
     public function store(Request $request)
     {
         $url = env('URL_SERVER_API');
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'code' => ['nullable', 'string', 'max:50'],
-            'responsible' => ['nullable', 'string', 'max:255'],
-            'status' => ['required', 'in:active,inactive'],
-            'description' => ['nullable', 'string'],
-        ]);
-
-        Http::post($url . '/areas', $data)->throw();
+        Http::post($url . '/areas', $request->all());
 
         return redirect()->route('areas.index');
     }
@@ -56,22 +49,14 @@ class Areas extends Controller
     public function edit($id)
     {
         $url = env('URL_SERVER_API');
-        $areas = $this->fetchDataFromApi($url . '/areas/' . $id);
-        return view('areas.edit', compact('areas'));
+        $area = $this->fetchDataFromApi($url . '/areas/' . $id);
+        return view('areas.edit', compact('area'));
     }
 
     public function update(Request $request, $id)
     {
         $url = env('URL_SERVER_API');
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'code' => ['sometimes', 'nullable', 'string', 'max:50'],
-            'responsible' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'status' => ['sometimes', 'in:active,inactive'],
-            'description' => ['sometimes', 'nullable', 'string'],
-        ]);
-
-        Http::put($url . '/areas/' . $id, $data)->throw();
+        Http::put($url . '/areas/' . $id, $request->all());
 
         return redirect()->route('areas.index');
     }
@@ -79,7 +64,7 @@ class Areas extends Controller
     public function destroy($id)
     {
         $url = env('URL_SERVER_API');
-        Http::delete($url . '/areas/' . $id)->throw();
+        Http::delete($url . '/areas/' . $id);
         return redirect()->route('areas.index');
     }
 }

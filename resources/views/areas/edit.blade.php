@@ -12,7 +12,7 @@
                     <p class="mb-0 text-white-50 mt-1 small">Actualice la información del área seleccionada.</p>
                 </div>
                 <div class="card-body p-4 p-md-5">
-                    <form action="{{ route('area.update', $areas->id) }}" method="POST">
+                    <form action="{{ route('area.update', data_get($area, 'id')) }}" method="POST">
                         @csrf
                         @method('PUT')
                         <div class="mb-4">
@@ -24,7 +24,7 @@
                                 class="form-control form-control-lg @error('name') is-invalid @enderror"
                                 id="name"
                                 name="name"
-                                value="{{ old('name', $areas->name) }}"
+                                value="{{ old('name', data_get($area, 'name')) }}"
                                 placeholder="Ingrese el nombre del área"
                                 required>
                             @error('name')
@@ -42,7 +42,7 @@
                                 name="description"
                                 rows="4"
                                 placeholder="Ingrese una descripción"
-                                style="resize: none;">{{ old('description', $areas->description ?? '') }}</textarea>
+                                style="resize: none;">{{ old('description', data_get($area, 'description', '')) }}</textarea>
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end pt-2 border-top">

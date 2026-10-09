@@ -9,7 +9,8 @@ class Teachers extends Controller
 {
     private function fetchDataFromApi($url)
     {
-        return Http::get($url)->throw()->object();
+        $response = Http::get($url);
+        return $response->json();
     }
 
     public function index()
@@ -30,26 +31,13 @@ class Teachers extends Controller
 
     public function create()
     {
-        $url = env('URL_SERVER_API');
-        $areas = $this->fetchDataFromApi($url . '/areas');
-        $trainingCenters = $this->fetchDataFromApi($url . '/training-centers');
-        $teacher = null;
-        $isEditing = false;
-
-        return view('teachers.form', compact('teacher', 'areas', 'trainingCenters', 'isEditing'));
+        return view('teachers.create');
     }
 
     public function store(Request $request)
     {
         $url = env('URL_SERVER_API');
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'area_id' => ['required', 'integer', 'min:1'],
-            'training_center_id' => ['required', 'integer', 'min:1'],
-        ]);
-
-        Http::post($url . '/teachers', $data)->throw();
+        Http::post($url . '/teachers', $request->all());
 
         return redirect()->route('teachers.index');
     }
@@ -58,24 +46,13 @@ class Teachers extends Controller
     {
         $url = env('URL_SERVER_API');
         $teacher = $this->fetchDataFromApi($url . '/teachers/' . $id);
-        $areas = $this->fetchDataFromApi($url . '/areas');
-        $trainingCenters = $this->fetchDataFromApi($url . '/training-centers');
-        $isEditing = true;
-
-        return view('teachers.form', compact('teacher', 'areas', 'trainingCenters', 'isEditing'));
+        return view('teachers.edit', compact('teacher'));
     }
 
     public function update(Request $request, $id)
     {
         $url = env('URL_SERVER_API');
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'area_id' => ['required', 'integer', 'min:1'],
-            'training_center_id' => ['required', 'integer', 'min:1'],
-        ]);
-
-        Http::put($url . '/teachers/' . $id, $data)->throw();
+        Http::put($url . '/teachers/' . $id, $request->all());
 
         return redirect()->route('teachers.index');
     }
@@ -83,7 +60,7 @@ class Teachers extends Controller
     public function destroy($id)
     {
         $url = env('URL_SERVER_API');
-        Http::delete($url . '/teachers/' . $id)->throw();
+        Http::delete($url . '/teachers/' . $id);
 
         return redirect()->route('teachers.index');
     }

@@ -9,7 +9,8 @@ class Computers extends Controller
         // Método privado para manejar llamadas HTTP repetitivas
         private function fetchDataFromApi($url)
         {
-            return Http::get($url)->throw()->object();
+            $response = Http::get($url);
+            return $response->json();
     }
 
     public function index()   //http://api.codersfree.test/v1/categories?included=posts
@@ -39,12 +40,7 @@ class Computers extends Controller
     public function store(Request $request)
     {
         $url = env('URL_SERVER_API');
-        $data = $request->validate([
-            'number' => ['required', 'integer', 'min:1'],
-            'brand' => ['required', 'string', 'max:255'],
-        ]);
-
-        Http::post($url . '/computers', $data)->throw();
+        Http::post($url . '/computers', $request->all());
 
         return redirect()->route('computers.index');
     }
@@ -59,12 +55,7 @@ class Computers extends Controller
     public function update(Request $request, $id)
     {
         $url = env('URL_SERVER_API');
-        $data = $request->validate([
-            'number' => ['required', 'integer', 'min:1'],
-            'brand' => ['required', 'string', 'max:255'],
-        ]);
-
-        Http::put($url . '/computers/' . $id, $data)->throw();
+        Http::put($url . '/computers/' . $id, $request->all());
 
         return redirect()->route('computers.index');
     }
@@ -72,7 +63,7 @@ class Computers extends Controller
     public function destroy($id)
     {
         $url = env('URL_SERVER_API');
-        Http::delete($url . '/computers/' . $id)->throw();
+        Http::delete($url . '/computers/' . $id);
         return redirect()->route('computers.index');
     }
 }
